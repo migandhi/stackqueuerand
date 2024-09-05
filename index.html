@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pseudo Random Number Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .container {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        pre {
+            background-color: #f4f4f9;
+            padding: 15px;
+            border-radius: 8px;
+            white-space: pre-wrap;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Pseudo Random Number Generator</h1>
+    <p>Generate random numbers using a stack and queue algorithm</p>
+    
+    <label for="seed">Seed:</label>
+    <input type="number" id="seed" placeholder="Enter seed" required>
+    <br><br>
+    <label for="count">How many numbers?</label>
+    <input type="number" id="count" placeholder="Number of randoms" required>
+    <br><br>
+    <button onclick="generateRandom()">Generate Random Numbers</button>
+
+    <div id="result"></div>
+
+    <h2>Explanation</h2>
+    <pre>
+        This method generates pseudo-random numbers using only a stack and a queue. 
+        We manipulate the seed value through mathematical operations to simulate randomness. 
+        A stack is used to store the initial numbers, and a queue is used to shuffle them.
+
+        Efficiency:
+        - Time complexity: O(n) for generating n numbers, because each number goes through a series of stack and queue operations.
+        - Space complexity: O(n) for storing the numbers in the stack and queue.
+
+        Compared to the built-in Math.random():
+        - Math.random() is a highly optimized, efficient built-in method with a time complexity of O(1) per random number.
+        - This method is slower and less random compared to Math.random() due to manual manipulation.
+    </pre>
+</div>
+
+<script>
+    // Stack implementation using JavaScript array
+    class Stack {
+        constructor() {
+            this.stack = [];
+        }
+
+        // Push an element onto the stack
+        push(value) {
+            this.stack.push(value);
+        }
+
+        // Pop an element from the stack
+        pop() {
+            return this.stack.length ? this.stack.pop() : null;
+        }
+
+        // Check if stack is empty
+        isEmpty() {
+            return this.stack.length === 0;
+        }
+    }
+
+    // Queue implementation using JavaScript array
+    class Queue {
+        constructor() {
+            this.queue = [];
+        }
+
+        // Enqueue an element to the queue
+        enqueue(value) {
+            this.queue.push(value);
+        }
+
+        // Dequeue an element from the queue
+        dequeue() {
+            return this.queue.length ? this.queue.shift() : null;
+        }
+
+        // Check if the queue is empty
+        isEmpty() {
+            return this.queue.length === 0;
+        }
+    }
+
+    // Function to generate pseudo-random numbers using stack and queue
+    function generatePseudoRandom(seed, count) {
+        const stack = new Stack();
+        const queue = new Queue();
+        const randomNumbers = [];
+
+        // Initialize stack with manipulated seed values
+        for (let i = 0; i < count; i++) {
+            // Use a combination of the seed, index, and some arithmetic operations to create pseudo-randomness
+            let value = (seed * (i + 3)) % 100; // Modulo 100 for values between 0-99
+            value = (value + i * 7) % 100;      // Adding i * 7 for more randomness
+            stack.push(value);
+        }
+
+        // Transfer numbers from stack to queue (this reverse operation introduces more pseudo-randomness)
+        while (!stack.isEmpty()) {
+            queue.enqueue(stack.pop());
+        }
+
+        // Shuffle numbers by dequeuing and modifying them slightly
+        for (let i = 0; i < count; i++) {
+            let num = queue.dequeue();
+            randomNumbers.push(num);
+
+            // Modify number and re-enqueue for further shuffling
+            let modifiedNum = (num + i * 5) % 100;  // Simple modification using the index
+            queue.enqueue(modifiedNum);
+        }
+
+        return randomNumbers;
+    }
+
+    // Function that gets called when the user clicks the "Generate Random Numbers" button
+    function generateRandom() {
+        const seed = parseInt(document.getElementById('seed').value);
+        const count = parseInt(document.getElementById('count').value);
+
+        if (isNaN(seed) || isNaN(count) || count <= 0) {
+            alert('Please enter valid numbers for seed and count');
+            return;
+        }
+
+        // Generate random numbers and display them
+        const randomNumbers = generatePseudoRandom(seed, count);
+        document.getElementById('result').innerHTML = `<strong>Generated Numbers:</strong> ${randomNumbers.join(', ')}`;
+    }
+</script>
+
+</body>
+</html>
